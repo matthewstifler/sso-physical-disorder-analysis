@@ -40,3 +40,6 @@ levels(observation.data$windows.bars.share)[c(1:7, 15, 31, 38:41, 46, 50, 60, 62
 levels(observation.data$windows.bars.share)[c(53:62, 64, 66, 68:70, 72:79, 81:84, 86:96, 99, 102, 103, 105:107, 111, 114:126, 128:153, 155: 163, 166:170)] = NA
 levels(observation.data$windows.bars.share)[c(53:72)] = c(0.2, 1, 0.22, 0.25, 0.3, 0.33, 0.05, 0.05, 0.5, 0.5, 0.6, 0.8, 0.5, 1, 0.9, 0.95, 1, 0, 0.017, 0.063)
 observation.data$windows.bars.share %<>% as.character %>% as.numeric
+
+levels(observation.data$broken.cars) = c(NA, NA, 0, 1, 2, 3, 5, NA, NA, NA, NA, NA)
+levels(observation.data$benches) = c(NA, NA, levels(observation.data$benches)[3:11], 5, 1, NA, NA, 0, NA, NA, NA, 0, NA, 0)
