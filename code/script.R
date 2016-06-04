@@ -17,3 +17,12 @@ levels(observation.data$garbage.bins) = c(NA, NA, levels(observation.data$garbag
 levels(observation.data$graffiti) = c(NA, rep(levels(observation.data$graffiti)[12], 4), levels(observation.data$graffiti)[10], levels(observation.data$graffiti)[11], levels(observation.data$graffiti)[9], levels(observation.data$graffiti)[9:12], NA, NA, NA, NA)
 
 #dealing with fucked up security
+observation.data$security %<>% as.character
+observation.data$security[observation.data$security == "01.май"] = "1;5"
+observation.data$security[observation.data$security == "02.май"] = "2;5"
+sec.no = ifelse((str_count(observation.data$security, "u'no'") > 0) | (str_count(observation.data$security, "0") > 0), 1, 0)# no or 0
+sec.guard = ifelse((str_count(observation.data$security, "u'guards'") > 0) | (str_count(observation.data$security, "1") > 0), 1, 0)
+sec.fence = ifelse((str_count(observation.data$security, "u'fence'") > 0) | (str_count(observation.data$security, "2") > 0) | (str_count(observation.data$security, "3") > 0), 1, 0)
+sec.cctv = ifelse((str_count(observation.data$security, "u'surveillance_facade'") > 0) | (str_count(observation.data$security, "4") > 0), 1, 0)
+
+observation.data = cbind(observation.data, as.factor(sec.no), sec.guard %>% as.factor, sec.fence %>% as.factor, sec.cctv %>% as.factor)
