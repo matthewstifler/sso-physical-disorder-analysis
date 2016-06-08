@@ -56,5 +56,16 @@ coord = geocode(location = str_c(observation.data$street, observation.data$adres
 observation.data[is.na(coord$lon),2:3] %>% View
 observation.data[,2] %<>% as.character #for cleaning up
 observation.data[,3] %<>% as.character 
+#cleaning up adresses
 observation.data[is.na(coord$lon),3] = str_replace_all(observation.data[is.na(coord$lon),3], "\\(.*\\)", " ") %>% str_replace_all(",|;( )?(.*)", " ") #remove everyhting behind semi-column or comma too
 observation.data[is.na(coord$lon),2] = str_replace_all(observation.data[is.na(coord$lon),2], "\\(.*\\)", " ") #remove everything in paretheses
+na.for.adress = str_extract_all(observation.data[is.na(coord$lon),3], "^\\d{1,3}|\\d{1,3}[А-ЙЛ-Яа-йл-я]|\\d{1,3}[А-Яа-я]\\d{1,3}", " ") %>% is.na #only get those, who follow the regexp, begins with digits, can have корпус or литера
+observation.data[is.na(coord$lon),2:3][na.for.adress == TRUE,] = NA #take rows which are na in coord, then take those who failed test on previous line (means they are unrestorable) and assign NA to them
+observation.data[is.na(coord$lon) | is.na(observation.data$adress),] %>% View
+observation.data$adress[c(208,217,218, 528, 620, 728, 761, 827, 882, 963, 967, 1066, 1091, 1120, 1187, 1188)] = NA #these can't be restored no more :(
+observation.data$adress[c(467,498, 584, 628, 651, 786, 787, 1303, 1508, 1509, 1533, 1846)] = c("23", "23", "21", "2", "23", "15а", "15а", "26", "8", "8 корпус 2", "24", "20") #restoring a few by hand
+observation.data$street[c(188, 248, 584, 620, 651, 1120, 1187, 1188, 1303, 1510, 1593, 1845, 1846, 1889, 1896:1898)] = c("Бабушкина", "Глухозверское шоссе", "Ольги Берггольц", "Ольминского", "Пинегина", "Хрустальная", "Шелгунова", "Шелгунова", "Бабушкина", "Мельничная", "Бабушкина", "Седова", "Седова", "Бабушкина", rep("Ольги Берггольц", 3)) #same for streets
+
+#ok, everything seems to be taken care of, let's re-geocode the missings
+coord[is.na(coord$lon),] = geocode(location = str_c(observation.data[is.na(coord$lon),]$street, observation.data[is.na(coord$lon),]$adress, sep = " "), output = "latlon", source = "google")
+observation.data = cbind(observation.data, coord)
