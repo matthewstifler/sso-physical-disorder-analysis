@@ -48,9 +48,13 @@ observation.data$windows.bars.share %<>% as.character %>% as.numeric
 levels(observation.data$broken.cars) = c(NA, NA, 0, 1, 2, 3, 5, NA, NA, NA, NA, NA)
 levels(observation.data$benches) = c(NA, NA, levels(observation.data$benches)[3:11], 5, 1, NA, NA, 0, NA, NA, NA, 0, NA, 0)
 
+observation.data$security = NULL
 #working with coordinates
 
 coord = geocode(location = str_c(observation.data$street, observation.data$adress, sep = " "), output = "latlon", source = "google")
 #we got nas, gotta take a closer look at adresses
 observation.data[is.na(coord$lon),2:3] %>% View
-
+observation.data[,2] %<>% as.character #for cleaning up
+observation.data[,3] %<>% as.character 
+observation.data[is.na(coord$lon),3] = str_replace_all(observation.data[is.na(coord$lon),3], "\\(.*\\)", " ") %>% str_replace_all(",|;( )?(.*)", " ") #remove everyhting behind semi-column or comma too
+observation.data[is.na(coord$lon),2] = str_replace_all(observation.data[is.na(coord$lon),2], "\\(.*\\)", " ") #remove everything in paretheses
