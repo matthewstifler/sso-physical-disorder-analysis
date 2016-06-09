@@ -69,3 +69,14 @@ observation.data$street[c(188, 248, 584, 620, 651, 1120, 1187, 1188, 1303, 1510,
 #ok, everything seems to be taken care of, let's re-geocode the missings
 coord[is.na(coord$lon),] = geocode(location = str_c(observation.data[is.na(coord$lon),]$street, observation.data[is.na(coord$lon),]$adress, sep = " "), output = "latlon", source = "google")
 observation.data = cbind(observation.data, coord)
+
+#now, creating unique ids based on  unique lat-lon combinations
+observation.data$latlon = str_c(observation.data$lat, observation.data$lon, sep = ", ")
+map.data = observation.data[!is.na(observation.data$latlon),]
+map.data$id = 1:nrow(map.data)
+for (i in 1:length(unique(map.data$latlon))){
+  map.data[unique(map.data$latlon)[i] == map.data$latlon,]$id = i
+}
+#gotta re-geocode adresses out of area of interest
+map.data[(map.data$lon > 30.55 | map.data$lon < 30.30) | (map.data$lat > 60 | map.data$lat < 59.70),c("lon", "lat")] = geocode(location = str_c(map.data[(map.data$lon > 30.55 | map.data$lon < 30.30) | (map.data$lat > 60 | map.data$lat < 59.70),]$street, map.data[(map.data$lon > 30.55 | map.data$lon < 30.30) | (map.data$lat > 60 | map.data$lat < 59.70),]$adress, sep = " ") %>% str_c("санкт-петербург", sep = ", "), output = "latlon", source = "google")
+
